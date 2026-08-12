@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+    Default: staging
+    AllowedValues:
+      - staging
+      - production
+  PermissionsBoundary:
+    Type: String
+    Description: >
+      The ARN of the permissions boundary to apply to any role created by the template
+    Default: "none"
+Conditions:
+  UsePermissionsBoundary:
+    Fn::Not:
+      - Fn::Equals:
+          - !Ref PermissionsBoundary
+          - "none"
+Mappings:
+  EnvironmentConfiguration:
+    staging:
+      GitHubOrganization: govuk-one-login-staging
+    production:
+      GitHubOrganization: govuk-one-login
+Resources:
+  GitBackupBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketNamePrefix: !Sub 
+        - "github-backup-${GHOrg}"
+        - GHOrg:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              GitHubOrganization,
+            ]
+      BucketNamespace: account-regional
+      VersioningConfiguration:
+        Status: Enabled
+      ObjectLockConfiguration:
+        ObjectLockEnabled: Enabled
+        Rule: 
+          DefaultRetention: 
+            Days: 15
+            Mode: COMPLIANCE
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: BackupFrequency
+          Value: Bihourly
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref GitBackupBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Sid: DenyInsecureTransport
+          Effect: Deny
+          Principal: "*"
+          Action: "s3:*"
+          Resource:
+            - !GetAtt GitBackupBucket.Arn
+            - !Sub "${GitBackupBucket.Arn}/*"
+          Condition:
+            Bool:
+              "aws:SecureTransport": "false"
+  GitHubBackupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: A role for GitHub Actions to assume
+      RoleName: github-backup-iam-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Federated:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+          Action:
+            - sts:AssumeRoleWithWebIdentity
+          Condition:
+            StringEquals:
+              "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+            StringLike:
+              "token.actions.githubusercontent.com:sub": !Sub
+                - "repo:${GHOrg}/*"
+                - GHOrg:
+                    !FindInMap [
+                      EnvironmentConfiguration,
+                      !Ref Environment,
+                      GitHubOrganization,
+                    ]
+      Path: /
+      Policies: 
+        - PolicyName: GitHubBackupRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub "arn:aws:s3:::${GitBackupBucket}"
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub "arn:aws:s3:::${GitBackupBucket}/*"
