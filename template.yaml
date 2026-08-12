@@ -7,6 +7,17 @@ Parameters:
     AllowedValues:
       - govuk-one-login-staging
       - govuk-one-login
+  PermissionsBoundary:
+    Type: String
+    Description: >
+      The ARN of the permissions boundary to apply to any role created by the template
+    Default: "none"
+Conditions:
+  UsePermissionsBoundary:
+    Fn::Not:
+      - Fn::Equals:
+          - !Ref PermissionsBoundary
+          - "none"
 Resources:
   GitBackupBucket:
     Type: AWS::S3::Bucket
