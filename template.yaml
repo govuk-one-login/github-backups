@@ -5,6 +5,11 @@ Parameters:
     Description: The name of the environment to deploy to
     Default: staging
     AllowedValues:
+      # There is no "build" environment, nor integraton
+      # The "staging" environment will hold backups from
+      # the govuk-one-login-staging GitHub organization,
+      # and the "production" environment those from the
+      # govuk-one-login GitHub organization.
       - staging
       - production
 Mappings:
