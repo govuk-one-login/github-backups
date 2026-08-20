@@ -51,6 +51,12 @@ Resources:
       Tags:
         - Key: BackupFrequency
           Value: Bihourly
+        - Key: Service
+          Value: github-backups
+        - Key: Source
+          Value: govuk-one-login/github-backups/template.yaml
+        - Key: Environment
+          Value: !Ref Environment
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
