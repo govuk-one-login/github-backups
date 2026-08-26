@@ -33,6 +33,7 @@ Resources:
       BucketNamespace: account-regional
       VersioningConfiguration:
         Status: Enabled
+      ObjectLockEnabled: True
       ObjectLockConfiguration:
         ObjectLockEnabled: Enabled
         Rule: 
