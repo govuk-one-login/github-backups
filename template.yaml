@@ -16,8 +16,10 @@ Mappings:
   EnvironmentConfiguration:
     staging:
       GitHubOrganization: govuk-one-login-staging
+      ImmutableGitHubOrganization: govuk-one-login-staging@184931542
     production:
       GitHubOrganization: govuk-one-login
+      ImmutableGitHubOrganization: govuk-one-login@105353241
 Resources:
   GitBackupBucket:
     Type: AWS::S3::Bucket
@@ -93,14 +95,19 @@ Resources:
             StringEquals:
               "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
             StringLike:
-              "token.actions.githubusercontent.com:sub": !Sub
-                - "repo:${GHOrg}/*"
-                - GHOrg:
-                    !FindInMap [
-                      EnvironmentConfiguration,
-                      !Ref Environment,
-                      GitHubOrganization,
-                    ]
+              "token.actions.githubusercontent.com:sub":
+                - !Sub
+                  - "repo:${SubjectClaim}/*"
+                  - SubjectClaim: !FindInMap
+                    - EnvironmentConfiguration
+                    - !Ref Environment
+                    - GitHubOrganization
+                - !Sub
+                  - "repo:${SubjectClaim}/*"
+                  - SubjectClaim: !FindInMap
+                    - EnvironmentConfiguration
+                    - !Ref Environment
+                    - ImmutableGitHubOrganization
       Path: /
       Policies: 
         - PolicyName: GitHubBackupRolePolicy
