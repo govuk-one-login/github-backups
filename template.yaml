@@ -25,7 +25,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketNamePrefix: !Sub 
-        - "github-backup-${GHOrg}"
+        - "${AWS::StackName}-${GHOrg}"
         - GHOrg:
             !FindInMap [
               EnvironmentConfiguration,
@@ -81,7 +81,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Description: A role for GitHub Actions to assume
-      RoleName: github-backup-iam-role
+      RoleName: !Sub "${AWS::StackName}-ClientRepositoryRole"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -110,7 +110,7 @@ Resources:
                     - ImmutableGitHubOrganization
       Path: /
       Policies: 
-        - PolicyName: GitHubBackupRolePolicy
+        - PolicyName: !Sub "${AWS::StackName}-ClientRepositoryRolePolicy"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
