@@ -24,14 +24,7 @@ Resources:
   GitBackupBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketNamePrefix: !Sub 
-        - "${AWS::StackName}-${GHOrg}"
-        - GHOrg:
-            !FindInMap [
-              EnvironmentConfiguration,
-              !Ref Environment,
-              GitHubOrganization,
-            ]
+      BucketNamePrefix: !Sub "${AWS::StackName}-${Environment}"
       BucketNamespace: account-regional
       VersioningConfiguration:
         Status: Enabled
