@@ -17,6 +17,12 @@ Parameters:
     Description: >
       The ARN of the permissions boundary to apply to any role created by the template
     Default: "none"
+Conditions:
+  UsePermissionsBoundary:
+    Fn::Not:
+      - Fn::Equals:
+          - !Ref PermissionsBoundary
+          - "none"
 Mappings:
   EnvironmentConfiguration:
     staging:
@@ -118,3 +124,7 @@ Resources:
               - Effect: Allow
                 Action: s3:PutObject
                 Resource: !Sub "arn:aws:s3:::${GitBackupBucket}/*"
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
