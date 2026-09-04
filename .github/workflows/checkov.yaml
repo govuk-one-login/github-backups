@@ -10,6 +10,8 @@ on:
 
   workflow_dispatch:
 
+permissions: read-all # reset default permissions or this fails CKV2_GHA_1
+
 jobs:
   scan:
     permissions:
