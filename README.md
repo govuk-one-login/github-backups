@@ -15,5 +15,7 @@ contents will be backed up by
 [backup-as-a-service](https://github.com/govuk-one-login/backup-as-a-service)
 (so we get backups of our backups).
 
+![Architecture diagram illustrating the above text](./images/github-backups.drawio.png)
+
 ## Licence
 [MIT License](LICENSE)
