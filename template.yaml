@@ -60,7 +60,7 @@ Resources:
         LogFilePrefix: "s3-access-logs/"
         TargetObjectKeyFormat:
           PartitionedPrefix:
-            PartitionDataSource: EventTime
+            PartitionDateSource: EventTime
       Tags:
         - Key: BackupFrequency
           Value: Bihourly
