@@ -56,12 +56,11 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       LoggingConfiguration:
-        DestinationBucketName:
-          Fn::ImportValue:
-            !Sub "ghbackups-s3logs-${AWS::AccountId}-S3AccessLogsBucketName"
+        DestinationBucketName: !Sub di-s3-access-logs-${AWS::AccountId}-${AWS::Region}
+        LogFilePrefix: "s3-access-logs/"
         TargetObjectKeyFormat:
           PartitionedPrefix:
-            PartitionDateSource: 'DeliveryTime'
+            PartitionDataSource: EventTime
       Tags:
         - Key: BackupFrequency
           Value: Bihourly
