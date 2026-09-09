@@ -5,7 +5,7 @@ This repository contains a CloudFormation template which deploys:
 
 - an S3 bucket
 - a Bucket Policy
-- an IAM role for GitHub to assume, so it can `PutObject`
+- an IAM role for GitHub to assume, so it can `PutObject` and `PutObjectTagging`
 
 This will allow any repository in the relevant organization to use a
 shared GitHub workflow to upload files created by `git bundle` to the bucket.
