@@ -9,6 +9,9 @@ This repository contains a CloudFormation template which deploys:
 
 This will allow any repository in the relevant organization to use a
 shared GitHub workflow to upload files created by `git bundle` to the bucket.
+The role's policy ensures that it can only be assumed by an action that is using
+the shared workflow file. This prevents the S3 bucket from being used for
+anything else.
 
 The bucket itself is tagged with our `BackupFrequency` vocabulary, so its
 contents will be backed up by
