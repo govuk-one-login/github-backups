@@ -118,6 +118,13 @@ Resources:
                     - EnvironmentConfiguration
                     - !Ref Environment
                     - ImmutableGitHubOrganization
+              "token.actions.githubusercontent.com:job_workflow_ref":
+                - !Sub
+                  - "${Owner}/.github/.github/workflows/back-up-repository.yaml@*"
+                  - Owner: !FindInMap
+                    - EnvironmentConfiguration
+                    - !Ref Environment
+                    - GitHubOrganization
       Path: /
       Policies: 
         - PolicyName: !Sub "${AWS::StackName}-ClientRepositoryRolePolicy"
